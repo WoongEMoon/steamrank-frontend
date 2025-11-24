@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import "./App.css";
 
 const API_BASE = "https://steamrank-backend.onrender.com";
-// Render에 배포된 FastAPI 서버 주소
 
 function SteamRankKorea() {
   const [searchText, setSearchText] = useState("");
@@ -21,7 +20,7 @@ function SteamRankKorea() {
     }
 
     try {
-      const res = await fetch(`${API_BASE}/api/search?q=${encodeURIComponent(value)}`);
+      const res = await fetch(`${API_BASE}/search?q=${encodeURIComponent(value)}`);
       const data = await res.json();
       setSearchResults(data.results || []);
     } catch (error) {
@@ -34,13 +33,17 @@ function SteamRankKorea() {
     if (!selectedDate) return;
 
     setLoading(true);
+
     try {
-      const res = await fetch(`${API_BASE}/api/rankings?date=${selectedDate}`);
+      const res = await fetch(`${API_BASE}/rank?date=${selectedDate}`);
       const data = await res.json();
-      setRankings(data.rankings || []);
+
+      // FastAPI는 배열을 반환하므로 data 그대로 사용
+      setRankings(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error("랭킹 불러오기 실패:", error);
     }
+
     setLoading(false);
   };
 
@@ -105,7 +108,9 @@ function SteamRankKorea() {
               <li key={idx} className="ranking-item">
                 <span className="rank">#{item.rank}</span>
                 <span className="name">{item.name}</span>
-                <span className="players">{item.players.toLocaleString()}명</span>
+                <span className="players">
+                  {item.concurrent_players.toLocaleString()}명
+                </span>
               </li>
             ))}
           </ul>

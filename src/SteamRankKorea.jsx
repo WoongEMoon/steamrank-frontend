@@ -10,7 +10,7 @@ function SteamRankKorea() {
   const [rankings, setRankings] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  // 🔎 자동완성 검색
+  // 🔎 자동완성 검색 (한국 게임 names)
   const handleSearch = async (value) => {
     setSearchText(value);
 
@@ -20,7 +20,9 @@ function SteamRankKorea() {
     }
 
     try {
-      const res = await fetch(`${API_BASE}/search?q=${encodeURIComponent(value)}`);
+      const res = await fetch(
+        `${API_BASE}/search?q=${encodeURIComponent(value)}`
+      );
       const data = await res.json();
       setSearchResults(data.results || []);
     } catch (error) {
@@ -28,7 +30,7 @@ function SteamRankKorea() {
     }
   };
 
-  // 📅 날짜별 랭킹 조회
+  // 📅 날짜별 한국 게임 랭킹 조회
   const fetchRankings = async () => {
     if (!selectedDate) return;
 
@@ -37,8 +39,6 @@ function SteamRankKorea() {
     try {
       const res = await fetch(`${API_BASE}/rank?date=${selectedDate}`);
       const data = await res.json();
-
-      // FastAPI는 배열을 반환하므로 data 그대로 사용
       setRankings(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error("랭킹 불러오기 실패:", error);
@@ -54,6 +54,11 @@ function SteamRankKorea() {
     }
   };
 
+  const goToSteam = (steamAppId) => {
+    if (!steamAppId) return;
+    window.open(`https://store.steampowered.com/app/${steamAppId}`, "_blank");
+  };
+
   return (
     <div className="app-container">
       <h1>🎮 SteamRank Korea</h1>
@@ -67,7 +72,6 @@ function SteamRankKorea() {
           onChange={(e) => handleSearch(e.target.value)}
         />
 
-        {/* 검색 자동완성 리스트 */}
         {searchResults.length > 0 && (
           <ul className="autocomplete-list">
             {searchResults.map((game, idx) => (
@@ -93,7 +97,7 @@ function SteamRankKorea() {
           value={selectedDate}
           onChange={(e) => setSelectedDate(e.target.value)}
         />
-        <button onClick={fetchRankings}>불러오기</button>
+        <button onClick={fetchRankings}>조회</button>
       </div>
 
       {/* 📊 결과 */}
@@ -101,15 +105,40 @@ function SteamRankKorea() {
 
       {!loading && rankings.length > 0 && (
         <div className="rankings-container">
-          <h2>📈 {selectedDate} 랭킹</h2>
+          <h2>📈 {selectedDate} 한국 게임 동접자 랭킹</h2>
 
           <ul className="rankings-list">
-            {rankings.map((item, idx) => (
-              <li key={idx} className="ranking-item">
+            {rankings.map((item) => (
+              <li
+                key={item.appid}
+                className="ranking-item"
+                onClick={() => goToSteam(item.steam_appid)}
+              >
                 <span className="rank">#{item.rank}</span>
-                <span className="name">{item.name}</span>
+
+                {item.profile_img && (
+                  <img
+                    src={item.profile_img}
+                    alt={item.name}
+                    className="thumbnail"
+                  />
+                )}
+
+                <div className="info">
+                  <div className="title">{item.name}</div>
+                  <div className="sub">
+                    <span className="price">
+                      {item.price ? item.price : "가격 정보 없음"}
+                    </span>
+                  </div>
+                </div>
+
                 <span className="players">
-                  {item.concurrent_players.toLocaleString()}명
+                  현재 동접자:{" "}
+                  {item.players !== null && item.players !== undefined
+                    ? item.players.toLocaleString()
+                    : 0}
+                  명
                 </span>
               </li>
             ))}
@@ -118,7 +147,7 @@ function SteamRankKorea() {
       )}
 
       {!loading && selectedDate && rankings.length === 0 && (
-        <p>⚠️ 해당 날짜의 랭킹 데이터가 없습니다.</p>
+        <p>⚠️ 해당 날짜의 한국 게임 랭킹 데이터가 없습니다.</p>
       )}
     </div>
   );

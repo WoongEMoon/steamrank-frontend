@@ -37,7 +37,7 @@ function SteamRankKorea() {
     setLoading(true);
 
     try {
-      const res = await fetch(`${API_BASE}/rank?date=${selectedDate}`);
+      const res = await fetch(`${API_BASE}/rankings?date=${selectedDate}`);
       const data = await res.json();
       setRankings(Array.isArray(data) ? data : []);
     } catch (error) {

@@ -16,8 +16,8 @@ function SteamRankKorea() {
     setLoading(true);
     try {
       const res = await fetch(
-        `https://steamrank-backend.onrender.com/rankings?date=${selectedDate}`
-      );
+        `https://steamrank-backend.onrender.com/api/rankings?date=${selectedDate}`
+    );
       const data = await res.json();
       setRankings(data);
     } catch (err) {

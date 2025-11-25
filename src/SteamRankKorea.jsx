@@ -3,6 +3,7 @@ import "./App.css";
 
 const API_BASE = "https://steamrank-backend.onrender.com";
 
+
 function SteamRankKorea() {
   const [searchText, setSearchText] = useState("");
   const [searchResults, setSearchResults] = useState([]);
@@ -37,7 +38,7 @@ function SteamRankKorea() {
     setLoading(true);
 
     try {
-      const res = await fetch(`${API_BASE}/rankings?date=${selectedDate}`);
+      const res = await fetch(`${API_BASE}/api/rankings?date=${selectedDate}`)
       const data = await res.json();
       setRankings(Array.isArray(data) ? data : []);
     } catch (error) {

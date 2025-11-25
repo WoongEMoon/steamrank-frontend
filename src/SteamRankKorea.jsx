@@ -1,157 +1,82 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import "./App.css";
 
-const API_BASE = "https://steamrank-backend.onrender.com";
-
 function SteamRankKorea() {
-  const [selectedDate, setSelectedDate] = useState("");
   const [rankings, setRankings] = useState([]);
+  const [date, setDate] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // 🔍 자동검색용
-  const [searchText, setSearchText] = useState("");
-  const [searchResults, setSearchResults] = useState([]);
-  const listRef = useRef(null);
+  useEffect(() => {
+    const today = new Date().toISOString().split("T")[0];
+    setDate(today);
+    fetchRankings(today);
+  }, []);
 
-  // 📅 날짜별 랭킹 불러오기
-  const fetchRankings = async () => {
-    if (!selectedDate) return;
-
+  const fetchRankings = async (selectedDate) => {
     setLoading(true);
     try {
-      const res = await fetch(`${API_BASE}/api/rankings?date=${selectedDate}`);
+      const res = await fetch(
+        `https://steamrank-backend.onrender.com/rankings?date=${selectedDate}`
+      );
       const data = await res.json();
-      const cleanData = Array.isArray(data) ? data : [];
-
-      setRankings(cleanData);
-
-      // 날짜 설정 후 자동검색 결과 초기화
-      setSearchResults([]);
-    } catch (error) {
-      console.error("랭킹 불러오기 실패:", error);
+      setRankings(data);
+    } catch (err) {
+      console.error("불러오기 실패:", err);
     }
     setLoading(false);
   };
 
-  // 🔍 검색 로직
-  useEffect(() => {
-    if (!searchText.trim() || rankings.length === 0) {
-      setSearchResults([]);
-      return;
-    }
-
-    const q = searchText.toLowerCase();
-
-    const filtered = rankings.filter((g) =>
-      g.name.toLowerCase().includes(q)
-    );
-
-    setSearchResults(filtered.slice(0, 8)); // 자동완성 최대 8개
-  }, [searchText, rankings]);
-
-  // 검색 항목 클릭 → 해당 아이템으로 스크롤 이동
-  const scrollToGame = (appid) => {
-    if (!listRef.current) return;
-
-    const target = document.getElementById(`game-${appid}`);
-    if (target) {
-      target.scrollIntoView({ behavior: "smooth", block: "center" });
-      setSearchResults([]);
-      setSearchText("");
-    }
-  };
-
-  const handleKeyDown = (e) => {
-    if (e.key === "Enter" && selectedDate) fetchRankings();
-  };
-
-  const goToSteam = (steamAppId) => {
-    if (!steamAppId) return;
-    window.open(`https://store.steampowered.com/app/${steamAppId}`, "_blank");
+  const handleSearchClick = () => {
+    fetchRankings(date);
   };
 
   return (
-    <div className="container">
-
-      <h1 className="title">🎮 SteamRank Korea</h1>
-
-      {/* 🔍 검색 박스 */}
-      <div className="search-box">
-        <input
-          type="text"
-          placeholder="게임 검색..."
-          value={searchText}
-          onChange={(e) => setSearchText(e.target.value)}
-        />
-
-        {/* 자동 완성 박스 */}
-        {searchResults.length > 0 && (
-          <ul className="autocomplete-box">
-            {searchResults.map((item) => (
-              <li key={item.appid} onClick={() => scrollToGame(item.appid)}>
-                {item.name}
-              </li>
-            ))}
-          </ul>
-        )}
+    <div>
+      {/* 상단 제목 */}
+      <div className="header">
+        <h1>🎮 SteamRank Korea</h1>
       </div>
 
-      {/* 날짜 박스 */}
-      <div className="date-box">
+      {/* 검색/날짜 선택 */}
+      <div className="top-controls">
         <input
           type="date"
-          value={selectedDate}
-          onChange={(e) => setSelectedDate(e.target.value)}
-          onKeyDown={handleKeyDown}
+          value={date}
+          onChange={(e) => setDate(e.target.value)}
         />
-        <button onClick={fetchRankings}>조회</button>
+        <button onClick={handleSearchClick}>조회</button>
+      </div>
+
+      {/* 날짜 제목 */}
+      <div className="date-title">
+        <span>📈</span> <span>{date} 한국 게임 동접자 랭킹</span>
       </div>
 
       {/* 로딩 */}
-      {loading && <p>⏳ 불러오는 중...</p>}
+      {loading && <p style={{ textAlign: "center" }}>불러오는 중...</p>}
 
-      {/* 랭킹 */}
-      {!loading && rankings.length > 0 && (
-        <div ref={listRef} className="rankings-container">
-          <h2>📈 {selectedDate} 한국 게임 동접자 랭킹</h2>
+      {/* 게임 리스트 */}
+      <div className="game-list">
+        {rankings.map((game, index) => (
+          <div key={game.appid} className="game-card">
+            <div className="rank-number">#{index + 1}</div>
 
-          <ul className="rankings-list">
-            {rankings.map((item, index) => (
-              <li
-                key={item.appid}
-                id={`game-${item.appid}`}
-                className="ranking-item"
-                onClick={() => goToSteam(item.steam_appid)}
-              >
-                <span className="rank">#{index + 1}</span>
+            <img
+              src={game.profile_img}
+              alt={game.name}
+              className="thumb"
+            />
 
-                {item.profile_img && (
-                  <img
-                    src={item.profile_img}
-                    alt={item.name}
-                    className="thumbnail"
-                  />
-                )}
+            <div className="game-info">
+              <div className="game-title">{game.name}</div>
+              <div className="game-sub">{game.price || "가격 정보 없음"}</div>
+              <div className="game-sub">현재 동접자: {game.players}</div>
+            </div>
 
-                <div className="info">
-                  <div className="title">{item.name}</div>
-                  <div className="sub">{item.price || "가격 정보 없음"}</div>
-                </div>
-
-                <span className="players">
-                  현재 동접자:{" "}
-                  {item.players ? item.players.toLocaleString() : 0}명
-                </span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-
-      {/* 데이터 없음 */}
-      {!loading && selectedDate && rankings.length === 0 && (
-        <p>⚠️ 해당 날짜의 한국 게임 랭킹 데이터가 없습니다.</p>
-      )}
+            <div className="right-label">동접자 수 기준 랭킹</div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

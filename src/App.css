@@ -1,119 +1,109 @@
+/* 전체 페이지 설정 */
 body {
-  background-color: #0b0f14;
-  color: #fff;
   margin: 0;
-  font-family: 'Segoe UI', sans-serif;
-}
-
-/* 메인 컨테이너 */
-.container {
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 20px;
-}
-
-/* 제목 */
-.title {
-  text-align: center;
-  font-size: 36px;
-  margin-bottom: 20px;
-  font-weight: bold;
-}
-
-/* 날짜 입력 영역 */
-.date-area {
-  text-align: center;
-  margin-bottom: 20px;
-}
-
-.date-area input {
-  padding: 6px 10px;
-  font-size: 15px;
-  border-radius: 5px;
-  border: 1px solid #444;
-  background-color: #1b2838;
+  background-color: #0d1117;
+  font-family: Arial, sans-serif;
   color: white;
 }
 
-.date-area button {
-  margin-left: 10px;
-  background-color: #66c0f4;
-  color: black;
-  border: none;
-  padding: 8px 14px;
-  border-radius: 5px;
-  cursor: pointer;
-  font-weight: bold;
+/* 헤더 */
+.header {
+  text-align: center;
+  margin-top: 20px;
+  margin-bottom: 20px;
 }
 
-.date-area button:hover {
-  background-color: #8fd1ff;
+/* 검색/날짜 박스 */
+.top-controls {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.top-controls input {
+  padding: 6px 10px;
+  border-radius: 5px;
+  border: 1px solid #444;
+  background-color: #1b1f24;
+  color: white;
+}
+
+.top-controls button {
+  padding: 6px 12px;
+  border: none;
+  background-color: #238636;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+/* 제목 */
+.date-title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-size: 26px;
+  margin-bottom: 10px;
+}
+
+/* 게임 카드 전체 리스트 */
+.game-list {
+  max-width: 900px;
+  margin: 0 auto;
+  padding-bottom: 40px;
 }
 
 /* 게임 카드 */
 .game-card {
-  background-color: #1b2838;
-  border-radius: 8px;
-  margin-bottom: 15px;
-  padding: 12px;
+  background-color: #161b22;
+  border-radius: 10px;
   display: flex;
+  padding: 16px;
+  margin-bottom: 18px;
+  gap: 16px;
   align-items: center;
-  transition: 0.2s;
 }
 
-.game-card:hover {
-  background-color: #243447;
-}
-
+/* 순위 숫자 */
 .rank-number {
-  width: 40px;
-  text-align: center;
-  font-size: 20px;
+  font-size: 22px;
   font-weight: bold;
+  color: #58a6ff;
+  width: 45px;
+  text-align: center;
 }
 
-/* 이미지 */
-.game-img {
-  width: 120px;
-  height: 55px;
-  border-radius: 5px;
-  margin-right: 20px;
+/* 썸네일 이미지 */
+.thumb {
+  width: 110px;
+  height: 60px;
   object-fit: cover;
+  border-radius: 6px;
 }
 
-/* 게임 정보 */
+/* 오른쪽 정보 부분 */
 .game-info {
   flex-grow: 1;
 }
 
-.game-name {
-  font-size: 20px;
+/* 게임 이름 */
+.game-title {
+  font-size: 18px;
   font-weight: bold;
   margin-bottom: 4px;
 }
 
-.game-price {
-  color: #66c0f4;
+/* 가격/동접자 */
+.game-sub {
   font-size: 14px;
-  margin-bottom: 5px;
+  color: #c9d1d9;
+  margin-bottom: 2px;
 }
 
-.game-players {
-  font-size: 13px;
-  color: #9ec2d3;
-}
-
-/* 리뷰 영역 */
-.review-box {
-  text-align: right;
+/* 우측 라벨 */
+.right-label {
+  color: #ffdf5d;
   font-size: 14px;
-}
-
-.today-review {
-  color: #ffd700;
-  font-weight: bold;
-}
-
-.total-review {
-  color: #bbb;
 }

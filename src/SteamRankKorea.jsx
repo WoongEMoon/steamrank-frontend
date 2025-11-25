@@ -3,7 +3,6 @@ import "./App.css";
 
 const API_BASE = "https://steamrank-backend.onrender.com";
 
-
 function SteamRankKorea() {
   const [searchText, setSearchText] = useState("");
   const [searchResults, setSearchResults] = useState([]);
@@ -11,7 +10,7 @@ function SteamRankKorea() {
   const [rankings, setRankings] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  // 🔎 자동완성 검색 (한국 게임 names)
+  // 🔎 자동완성 검색
   const handleSearch = async (value) => {
     setSearchText(value);
 
@@ -31,28 +30,25 @@ function SteamRankKorea() {
     }
   };
 
-  // 📅 날짜별 한국 게임 랭킹 조회
+  // 📅 날짜별 랭킹 조회
   const fetchRankings = async () => {
     if (!selectedDate) return;
 
     setLoading(true);
-
     try {
-      const res = await fetch(`${API_BASE}/api/rankings?date=${selectedDate}`)
+      const res = await fetch(
+        `${API_BASE}/api/rankings?date=${selectedDate}`
+      );
       const data = await res.json();
       setRankings(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error("랭킹 불러오기 실패:", error);
     }
-
     setLoading(false);
   };
 
-  // 엔터 입력 시 랭킹 호출
   const handleKeyDown = (e) => {
-    if (e.key === "Enter" && selectedDate) {
-      fetchRankings();
-    }
+    if (e.key === "Enter" && selectedDate) fetchRankings();
   };
 
   const goToSteam = (steamAppId) => {
@@ -61,61 +57,38 @@ function SteamRankKorea() {
   };
 
   return (
-    <div className="app-container">
-      <h1>🎮 SteamRank Korea</h1>
+    <div className="container">
 
-      {/* 🔎 검색 입력 */}
-      <div className="search-box">
-        <input
-          type="text"
-          placeholder="게임 검색..."
-          value={searchText}
-          onChange={(e) => handleSearch(e.target.value)}
-        />
+      {/* 타이틀 */}
+      <h1 className="title">🎮 SteamRank Korea</h1>
 
-        {searchResults.length > 0 && (
-          <ul className="autocomplete-list">
-            {searchResults.map((game, idx) => (
-              <li
-                key={idx}
-                onClick={() => {
-                  setSearchText(game);
-                  setSearchResults([]);
-                }}
-              >
-                {game}
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
-
-      {/* 📅 날짜 선택 */}
+      {/* 날짜 선택 */}
       <div className="date-box">
         <input
           type="date"
-          onKeyDown={handleKeyDown}
           value={selectedDate}
           onChange={(e) => setSelectedDate(e.target.value)}
+          onKeyDown={handleKeyDown}
         />
         <button onClick={fetchRankings}>조회</button>
       </div>
 
-      {/* 📊 결과 */}
+      {/* 로딩 */}
       {loading && <p>⏳ 불러오는 중...</p>}
 
+      {/* 데이터 */}
       {!loading && rankings.length > 0 && (
         <div className="rankings-container">
           <h2>📈 {selectedDate} 한국 게임 동접자 랭킹</h2>
 
           <ul className="rankings-list">
-            {rankings.map((item) => (
+            {rankings.map((item, index) => (
               <li
                 key={item.appid}
                 className="ranking-item"
                 onClick={() => goToSteam(item.steam_appid)}
               >
-                <span className="rank">#{item.rank}</span>
+                <span className="rank">#{index + 1}</span>
 
                 {item.profile_img && (
                   <img
@@ -128,15 +101,13 @@ function SteamRankKorea() {
                 <div className="info">
                   <div className="title">{item.name}</div>
                   <div className="sub">
-                    <span className="price">
-                      {item.price ? item.price : "가격 정보 없음"}
-                    </span>
+                    {item.price ? item.price : "가격 정보 없음"}
                   </div>
                 </div>
 
                 <span className="players">
                   현재 동접자:{" "}
-                  {item.players !== null && item.players !== undefined
+                  {item.players
                     ? item.players.toLocaleString()
                     : 0}
                   명
@@ -147,6 +118,7 @@ function SteamRankKorea() {
         </div>
       )}
 
+      {/* 데이터 없음 */}
       {!loading && selectedDate && rankings.length === 0 && (
         <p>⚠️ 해당 날짜의 한국 게임 랭킹 데이터가 없습니다.</p>
       )}

@@ -1,18 +1,15 @@
-// SteamRankKorea.jsx
+// SteamRankKorea.jsx (FINAL)
 import React, { useState, useEffect, useRef } from "react";
 import "./App.css";
 
 const API_URL = "https://steamrank-backend.onrender.com/api/rankings";
 
-// 가격 포맷
 const formatPrice = (price) => {
   if (!price) return "가격 정보 없음";
   if (String(price).toLowerCase() === "free") return "무료 플레이";
 
-  // 숫자 → $ 붙이기
   const num = parseFloat(price);
-  if (!isNaN(num)) return `$${num.toFixed(2)}`;
-
+  if (!isNaN(num)) return `$${num}`;
   return price;
 };
 
@@ -67,7 +64,6 @@ function SteamRankKorea() {
         </button>
       </div>
 
-      {/* 검색 */}
       <div className="search-wrapper">
         <input
           type="text"

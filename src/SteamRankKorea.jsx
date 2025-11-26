@@ -17,11 +17,12 @@ function SteamRankKorea() {
     try {
       const res = await fetch(
         `https://steamrank-backend.onrender.com/api/rankings?date=${selectedDate}`
-    );
+      );
       const data = await res.json();
       setRankings(data);
     } catch (err) {
       console.error("불러오기 실패:", err);
+      setRankings([]);
     }
     setLoading(false);
   };
@@ -55,10 +56,16 @@ function SteamRankKorea() {
       {/* 로딩 */}
       {loading && <p style={{ textAlign: "center" }}>불러오는 중...</p>}
 
-      {/* 게임 리스트 */}
+      {/* 리스트 */}
       <div className="game-list">
+        {rankings.length === 0 && !loading && (
+          <p style={{ textAlign: "center", marginTop: "20px" }}>
+            데이터를 찾을 수 없습니다.
+          </p>
+        )}
+
         {rankings.map((game, index) => (
-          <div key={game.appid} className="game-card">
+          <div key={game.steam_appid} className="game-card">
             <div className="rank-number">#{index + 1}</div>
 
             <img

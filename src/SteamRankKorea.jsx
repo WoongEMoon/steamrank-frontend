@@ -1,4 +1,4 @@
-// SteamRankKorea.jsx (FINAL)
+// SteamRankKorea.jsx (RESTORED + FIXED)
 import React, { useState, useEffect, useRef } from "react";
 import "./App.css";
 
@@ -95,42 +95,51 @@ function SteamRankKorea() {
       <h2 className="subtitle">📋 {date} 한국 게임 동접자 랭킹</h2>
 
       <div className="game-list">
-        {games.map((game, idx) => (
-          <div
-            key={game.appid}
-            ref={(el) => (itemRefs.current[game.appid] = el)}
-            className="game-item"
-          >
-            <div className="rank">#{idx + 1}</div>
+        {games.map((game, idx) => {
+          // 이미지 src 완전 고정(문자/객체 모두 대응)
+          const imgSrc =
+            typeof game.img === "string"
+              ? game.img
+              : game.img?.header_image ||
+                "https://via.placeholder.com/160x90?text=No+Image";
 
-            <img
-              className="game-img"
-              src={game.img}
-              alt={game.name}
-              onError={(e) =>
-                (e.target.src =
-                  "https://via.placeholder.com/160x90?text=No+Image")
-              }
-            />
+          return (
+            <div
+              key={game.appid}
+              ref={(el) => (itemRefs.current[game.appid] = el)}
+              className="game-item"
+            >
+              <div className="rank">#{idx + 1}</div>
 
-            <div className="game-info">
-              <div className="game-title">
-                <a
-                  href={`https://store.steampowered.com/app/${game.appid}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {game.name}
-                </a>
-              </div>
+              <img
+                className="game-img"
+                src={imgSrc}
+                alt={game.name}
+                onError={(e) =>
+                  (e.target.src =
+                    "https://via.placeholder.com/160x90?text=No+Image")
+                }
+              />
 
-              <div className="price">{formatPrice(game.price)}</div>
-              <div className="players">
-                현재 동접자: {game.players.toLocaleString()}
+              <div className="game-info">
+                <div className="game-title">
+                  <a
+                    href={`https://store.steampowered.com/app/${game.appid}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {game.name}
+                  </a>
+                </div>
+
+                <div className="price">{formatPrice(game.price)}</div>
+                <div className="players">
+                  현재 동접자: {game.players.toLocaleString()}
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       <footer className="footer">

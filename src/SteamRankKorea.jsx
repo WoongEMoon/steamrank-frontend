@@ -31,14 +31,17 @@ function SteamRankKorea() {
     fetchRankings(date);
   };
 
+  const openSteamPage = (appid) => {
+    const url = `https://store.steampowered.com/app/${appid}/`;
+    window.open(url, "_blank");
+  };
+
   return (
     <div>
-      {/* 상단 제목 */}
       <div className="header">
         <h1>🎮 SteamRank Korea</h1>
       </div>
 
-      {/* 검색/날짜 선택 */}
       <div className="top-controls">
         <input
           type="date"
@@ -48,15 +51,12 @@ function SteamRankKorea() {
         <button onClick={handleSearchClick}>조회</button>
       </div>
 
-      {/* 날짜 제목 */}
       <div className="date-title">
         <span>📈</span> <span>{date} 한국 게임 동접자 랭킹</span>
       </div>
 
-      {/* 로딩 */}
       {loading && <p style={{ textAlign: "center" }}>불러오는 중...</p>}
 
-      {/* 리스트 */}
       <div className="game-list">
         {rankings.length === 0 && !loading && (
           <p style={{ textAlign: "center", marginTop: "20px" }}>
@@ -65,7 +65,12 @@ function SteamRankKorea() {
         )}
 
         {rankings.map((game, index) => (
-          <div key={game.steam_appid} className="game-card">
+          <div
+            key={game.steam_appid}
+            className="game-card"
+            onClick={() => openSteamPage(game.steam_appid)}
+            style={{ cursor: "pointer" }}   // 클릭 가능한 느낌
+          >
             <div className="rank-number">#{index + 1}</div>
 
             <img

@@ -81,8 +81,9 @@ body {
   margin-top: 25px;
 }
 
+/* 🔥 박스 폭 줄임 */
 .game-list {
-  width: 950px;
+  width: 800px; /* 기존 950px → 축소 */
   margin: 25px auto;
 }
 
@@ -125,10 +126,11 @@ body {
   text-decoration: underline;
 }
 
+/* 🔥 가격 색을 동접자 색(#bfbfbf)과 동일하게 변경 */
 .price {
   margin-top: 6px;
   font-size: 16px;
-  color: #e6c068;
+  color: #bfbfbf; /* 기존 #e6c068 → 변경 */
 }
 
 .players {

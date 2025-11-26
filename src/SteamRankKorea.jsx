@@ -1,4 +1,4 @@
-// SteamRankKorea.jsx (RESTORED + FIXED)
+// SteamRankKorea.jsx (FINAL VERSION)
 import React, { useState, useEffect, useRef } from "react";
 import "./App.css";
 
@@ -20,10 +20,12 @@ function SteamRankKorea() {
   const [filtered, setFiltered] = useState([]);
   const itemRefs = useRef({});
 
+  // 오늘 날짜 자동 세팅
   useEffect(() => {
     setDate(new Date().toISOString().split("T")[0]);
   }, []);
 
+  // 데이터 불러오기
   const fetchData = async () => {
     try {
       const response = await fetch(`${API_URL}?date=${date}`);
@@ -34,9 +36,9 @@ function SteamRankKorea() {
     }
   };
 
+  // 자동완성
   useEffect(() => {
     if (!search.trim()) return setFiltered([]);
-
     const res = games.filter((g) =>
       g.name.toLowerCase().includes(search.toLowerCase())
     );
@@ -64,6 +66,7 @@ function SteamRankKorea() {
         </button>
       </div>
 
+      {/* 검색 */}
       <div className="search-wrapper">
         <input
           type="text"
@@ -94,9 +97,10 @@ function SteamRankKorea() {
 
       <h2 className="subtitle">📋 {date} 한국 게임 동접자 랭킹</h2>
 
+      {/* 리스트 */}
       <div className="game-list">
         {games.map((game, idx) => {
-          // 이미지 src 완전 고정(문자/객체 모두 대응)
+          // 🔥 이미지 무조건 표시되는 핵심 코드!
           const imgSrc =
             typeof game.img === "string"
               ? game.img

@@ -6,7 +6,7 @@ function SteamRankKorea() {
   const [date, setDate] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // 🔥 가격 변환 함수 완전 개선본
+  // 🔥 가격 변환 함수
   const formatPrice = (price) => {
     if (price === null || price === undefined || price === "") {
       return "가격 정보 없음";
@@ -14,17 +14,17 @@ function SteamRankKorea() {
 
     const p = price.toString().trim().toLowerCase();
 
-    // 무료 플레이 처리
+    // 무료 플레이
     if (p === "free" || p === "무료" || p === "0") {
       return "무료 플레이";
     }
 
-    // 🔥 달러 소수점 가격 (예: 10.99)
+    // 달러 소수점 (10.99)
     if (/^\d+\.\d+$/.test(p)) {
       return `$${p}`;
     }
 
-    // 순수 정수 (나중에 KRW 변환)
+    // 숫자만 있을 때
     if (/^\d+$/.test(p)) {
       return `${Number(p).toLocaleString("en-US")}`;
     }
@@ -63,58 +63,66 @@ function SteamRankKorea() {
   };
 
   return (
-    <div>
-      <div className="header">
-        <h1>🎮 SteamRank Korea</h1>
-      </div>
+    <div className="page-container">
+      <div className="content-wrap">
+        <div className="header">
+          <h1>🎮 SteamRank Korea</h1>
+        </div>
 
-      <div className="top-controls">
-        <input
-          type="date"
-          value={date}
-          onChange={(e) => setDate(e.target.value)}
-        />
-        <button onClick={handleSearchClick}>조회</button>
-      </div>
+        <div className="top-controls">
+          <input
+            type="date"
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+          />
+          <button onClick={handleSearchClick}>조회</button>
+        </div>
 
-      <div className="date-title">
-        <span>📈</span> <span>{date} 한국 게임 동접자 랭킹</span>
-      </div>
+        <div className="date-title">
+          <span>📈</span> <span>{date} 한국 게임 동접자 랭킹</span>
+        </div>
 
-      {loading && <p style={{ textAlign: "center" }}>불러오는 중...</p>}
+        {loading && <p style={{ textAlign: "center" }}>불러오는 중...</p>}
 
-      <div className="game-list">
-        {rankings.length === 0 && !loading && (
-          <p style={{ textAlign: "center", marginTop: "20px" }}>
-            데이터를 찾을 수 없습니다.
-          </p>
-        )}
+        <div className="game-list">
+          {rankings.length === 0 && !loading && (
+            <p style={{ textAlign: "center", marginTop: "20px" }}>
+              데이터를 찾을 수 없습니다.
+            </p>
+          )}
 
-        {rankings.map((game, index) => (
-          <div
-            key={game.steam_appid}
-            className="game-card"
-            onClick={() => openSteamPage(game.steam_appid)}
-            style={{ cursor: "pointer" }}
-          >
-            <div className="rank-number">#{index + 1}</div>
+          {rankings.map((game, index) => (
+            <div
+              key={game.steam_appid}
+              className="game-card"
+              onClick={() => openSteamPage(game.steam_appid)}
+              style={{ cursor: "pointer" }}
+            >
+              <div className="rank-number">#{index + 1}</div>
 
-            <img
-              src={game.profile_img}
-              alt={game.name}
-              className="thumb"
-            />
+              <img
+                src={game.profile_img}
+                alt={game.name}
+                className="thumb"
+              />
 
-            <div className="game-info">
-              <div className="game-title">{game.name}</div>
+              <div className="game-info">
+                <div className="game-title">{game.name}</div>
 
-              <div className="game-sub">{formatPrice(game.price)}</div>
+                <div className="game-sub">{formatPrice(game.price)}</div>
 
-              <div className="game-sub">현재 동접자: {game.players}</div>
+                <div className="game-sub">현재 동접자: {game.players}</div>
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
+
+      {/* 🔥 하단 비영리 안내 문구 추가 */}
+      <footer className="footer">
+        이 사이트는 비영리 캡스톤 디자인 과제 프로젝트이며,
+        Valve Corporation과 관련이 없습니다.
+      </footer>
     </div>
   );
 }

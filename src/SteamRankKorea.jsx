@@ -1,4 +1,4 @@
-// SteamRankKorea.jsx (FINAL VERSION)
+// SteamRankKorea.jsx (FINAL FIXED FOR profile_img)
 import React, { useState, useEffect, useRef } from "react";
 import "./App.css";
 
@@ -20,12 +20,10 @@ function SteamRankKorea() {
   const [filtered, setFiltered] = useState([]);
   const itemRefs = useRef({});
 
-  // 오늘 날짜 자동 세팅
   useEffect(() => {
     setDate(new Date().toISOString().split("T")[0]);
   }, []);
 
-  // 데이터 불러오기
   const fetchData = async () => {
     try {
       const response = await fetch(`${API_URL}?date=${date}`);
@@ -36,9 +34,9 @@ function SteamRankKorea() {
     }
   };
 
-  // 자동완성
   useEffect(() => {
     if (!search.trim()) return setFiltered([]);
+
     const res = games.filter((g) =>
       g.name.toLowerCase().includes(search.toLowerCase())
     );
@@ -66,7 +64,6 @@ function SteamRankKorea() {
         </button>
       </div>
 
-      {/* 검색 */}
       <div className="search-wrapper">
         <input
           type="text"
@@ -80,10 +77,10 @@ function SteamRankKorea() {
           <div className="autocomplete">
             {filtered.map((g) => (
               <div
-                key={g.appid}
+                key={g.steam_appid}
                 className="autocomplete-item"
                 onClick={() => {
-                  scrollToGame(g.appid);
+                  scrollToGame(g.steam_appid);
                   setSearch("");
                   setFiltered([]);
                 }}
@@ -97,20 +94,17 @@ function SteamRankKorea() {
 
       <h2 className="subtitle">📋 {date} 한국 게임 동접자 랭킹</h2>
 
-      {/* 리스트 */}
       <div className="game-list">
         {games.map((game, idx) => {
-          // 🔥 이미지 무조건 표시되는 핵심 코드!
+          // 🔥 여기! API 구조에 맞춘 최종 이미지 필드
           const imgSrc =
-            typeof game.img === "string"
-              ? game.img
-              : game.img?.header_image ||
-                "https://via.placeholder.com/160x90?text=No+Image";
+            game.profile_img ||
+            "https://via.placeholder.com/160x90?text=No+Image";
 
           return (
             <div
-              key={game.appid}
-              ref={(el) => (itemRefs.current[game.appid] = el)}
+              key={game.steam_appid}
+              ref={(el) => (itemRefs.current[game.steam_appid] = el)}
               className="game-item"
             >
               <div className="rank">#{idx + 1}</div>
@@ -128,7 +122,7 @@ function SteamRankKorea() {
               <div className="game-info">
                 <div className="game-title">
                   <a
-                    href={`https://store.steampowered.com/app/${game.appid}`}
+                    href={`https://store.steampowered.com/app/${game.steam_appid}`}
                     target="_blank"
                     rel="noopener noreferrer"
                   >

@@ -5,12 +5,22 @@ import "./App.css";
 const API_URL = "https://steamrank-backend.onrender.com/api/rankings";
 
 const formatPrice = (price) => {
-  if (!price) return "가격 정보 없음";
-  if (String(price).toLowerCase() === "free") return "무료 플레이";
+  // 무료 처리
+  if (
+    price === null ||
+    price === undefined ||
+    price === "" ||
+    String(price).toLowerCase() === "free" ||
+    Number(price) === 0
+  ) {
+    return "무료 플레이";
+  }
 
+  // 숫자 가격 ($로 표시)
   const num = parseFloat(price);
   if (!isNaN(num)) return `$${num}`;
-  return price;
+
+  return "가격 정보 없음";
 };
 
 function SteamRankKorea() {

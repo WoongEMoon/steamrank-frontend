@@ -1,91 +1,162 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import "./App.css";
 
-function SteamRankKorea() {
-  const [rankings, setRankings] = useState([]);
-  const [date, setDate] = useState("");
-  const [loading, setLoading] = useState(false);
+const API_URL = "https://steamrank-backend.onrender.com/api/rankings";
 
-  useEffect(() => {
-    const today = new Date().toISOString().split("T")[0];
-    setDate(today);
-    fetchRankings(today);
-  }, []);
+// 가격 포맷 함수
+const formatPrice = (price) => {
+    if (!price) return "가격 정보 없음";
+    if (price === "free") return "무료 플레이";
 
-  const fetchRankings = async (selectedDate) => {
-    setLoading(true);
-    try {
-      const res = await fetch(
-        `https://steamrank-backend.onrender.com/api/rankings?date=${selectedDate}`
-      );
-      const data = await res.json();
-      setRankings(data);
-    } catch (err) {
-      console.error("불러오기 실패:", err);
-      setRankings([]);
+    // USD (10.99 형태)
+    if (/^\d+\.\d{2}$/.test(price)) {
+        return `$${price}`;
     }
-    setLoading(false);
-  };
 
-  const handleSearchClick = () => {
-    fetchRankings(date);
-  };
+    // 정수 가격 → 원화로 처리
+    if (/^\d+$/.test(price)) {
+        return `${Number(price).toLocaleString()}원`;
+    }
 
-  return (
-    <div>
-      {/* 상단 제목 */}
-      <div className="header">
-        <h1>🎮 SteamRank Korea</h1>
-      </div>
+    return price;
+};
 
-      {/* 검색/날짜 선택 */}
-      <div className="top-controls">
-        <input
-          type="date"
-          value={date}
-          onChange={(e) => setDate(e.target.value)}
-        />
-        <button onClick={handleSearchClick}>조회</button>
-      </div>
+function SteamRankKorea() {
+    const [date, setDate] = useState("");
+    const [games, setGames] = useState([]);
+    const [search, setSearch] = useState("");
+    const [filtered, setFiltered] = useState([]);
+    const itemRefs = useRef({});
 
-      {/* 날짜 제목 */}
-      <div className="date-title">
-        <span>📈</span> <span>{date} 한국 게임 동접자 랭킹</span>
-      </div>
+    useEffect(() => {
+        const today = new Date().toISOString().split("T")[0];
+        setDate(today);
+    }, []);
 
-      {/* 로딩 */}
-      {loading && <p style={{ textAlign: "center" }}>불러오는 중...</p>}
+    const fetchData = async () => {
+        try {
+            const response = await fetch(`${API_URL}?date=${date}`);
+            const data = await response.json();
+            setGames(data);
+        } catch (error) {
+            console.error("API error:", error);
+        }
+    };
 
-      {/* 리스트 */}
-      <div className="game-list">
-        {rankings.length === 0 && !loading && (
-          <p style={{ textAlign: "center", marginTop: "20px" }}>
-            데이터를 찾을 수 없습니다.
-          </p>
-        )}
+    useEffect(() => {
+        if (search.trim() === "") {
+            setFiltered([]);
+            return;
+        }
+        const result = games.filter((g) =>
+            g.name.toLowerCase().includes(search.toLowerCase())
+        );
+        setFiltered(result.slice(0, 6));
+    }, [search, games]);
 
-        {rankings.map((game, index) => (
-          <div key={game.steam_appid} className="game-card">
-            <div className="rank-number">#{index + 1}</div>
+    const scrollToGame = (appid) => {
+        const element = itemRefs.current[appid];
+        if (element) {
+            element.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+    };
 
-            <img
-              src={game.profile_img}
-              alt={game.name}
-              className="thumb"
-            />
+    return (
+        <div className="app-container">
+            <h1 className="title">
+                🎮 <span>SteamRank Korea</span>
+            </h1>
 
-            <div className="game-info">
-              <div className="game-title">{game.name}</div>
-              <div className="game-sub">{game.price || "가격 정보 없음"}</div>
-              <div className="game-sub">현재 동접자: {game.players}</div>
+            <div className="controls">
+                <input
+                    type="date"
+                    value={date}
+                    onChange={(e) => setDate(e.target.value)}
+                    className="date-input"
+                />
+                <button className="fetch-btn" onClick={fetchData}>
+                    조회
+                </button>
             </div>
 
-            <div className="right-label">동접자 수 기준 랭킹</div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
+            {/* 검색창 */}
+            <div className="search-wrapper">
+                <input
+                    type="text"
+                    placeholder="게임 검색..."
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    className="search-input"
+                />
+
+                {filtered.length > 0 && (
+                    <div className="autocomplete">
+                        {filtered.map((g) => (
+                            <div
+                                key={g.appid}
+                                className="autocomplete-item"
+                                onClick={() => {
+                                    scrollToGame(g.appid);
+                                    setSearch("");
+                                    setFiltered([]);
+                                }}
+                            >
+                                {g.name}
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </div>
+
+            <h2 className="subtitle">
+                📋 {date} 한국 게임 동접자 랭킹
+            </h2>
+
+            <div className="game-list">
+                {games.map((game, idx) => (
+                    <div
+                        key={game.appid}
+                        ref={(el) => (itemRefs.current[game.appid] = el)}
+                        className="game-item"
+                    >
+                        <div className="rank">#{idx + 1}</div>
+
+                        <img
+                            src={game.img}
+                            alt={game.name}
+                            className="game-img"
+                            onError={(e) =>
+                                (e.target.src =
+                                    "https://via.placeholder.com/200x100?text=No+Image")
+                            }
+                        />
+
+                        <div className="game-info">
+                            <div className="game-title">
+                                <a
+                                    href={`https://store.steampowered.com/app/${game.appid}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                >
+                                    {game.name}
+                                </a>
+                            </div>
+
+                            <div className="price">{formatPrice(game.price)}</div>
+                            <div className="players">
+                                현재 동접자: {game.players.toLocaleString()}
+                            </div>
+                        </div>
+                    </div>
+                ))}
+            </div>
+
+            <footer className="footer">
+                이 사이트는 비영리 캡스톤 디자인 과제 프로젝트이며,<br />
+                Valve Corporation과 관련이 없습니다.
+            </footer>
+        </div>
+    );
 }
 
 export default SteamRankKorea;

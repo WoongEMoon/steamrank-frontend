@@ -5,23 +5,34 @@ import "./App.css";
 const API_URL = "https://steamrank-backend.onrender.com/api/rankings";
 
 const formatPrice = (price) => {
+  if (!price) return "가격 정보 없음";
+
+  const str = String(price).trim();
+
   // 무료 처리
   if (
-    price === null ||
-    price === undefined ||
-    price === "" ||
-    String(price).toLowerCase() === "free" ||
-    Number(price) === 0
+    str === "" ||
+    str === "0" ||
+    str.toLowerCase() === "free" ||
+    str.includes("무료")
   ) {
     return "무료 플레이";
   }
 
-  // 숫자 가격 ($로 표시)
-  const num = parseFloat(price);
-  if (!isNaN(num)) return `$${num}`;
+  // KRW: "₩ 64,800"
+  if (str.includes("₩")) {
+    return str; // 그대로 표시
+  }
 
-  return "가격 정보 없음";
+  // USD 처리: 5999 → $59.99
+  if (!isNaN(Number(str))) {
+    return `$${(Number(str) / 100).toFixed(2)}`;
+  }
+
+  // 기타 통화 그대로 표시
+  return str;
 };
+
 
 function SteamRankKorea() {
   const [date, setDate] = useState("");

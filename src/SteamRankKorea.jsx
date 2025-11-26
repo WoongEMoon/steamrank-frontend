@@ -6,23 +6,30 @@ function SteamRankKorea() {
   const [date, setDate] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // 가격 변환 함수
+  // 🔥 가격 변환 함수 완전 개선본
   const formatPrice = (price) => {
     if (price === null || price === undefined || price === "") {
       return "가격 정보 없음";
     }
 
-    const value = parseInt(price, 10);
+    const p = price.toString().trim().toLowerCase();
 
-    if (isNaN(value)) {
-      return "가격 정보 없음";
-    }
-
-    if (value === 0) {
+    // 무료 플레이 처리
+    if (p === "free" || p === "무료" || p === "0") {
       return "무료 플레이";
     }
 
-    return value.toLocaleString("ko-KR") + "원";
+    // 🔥 달러 소수점 가격 (예: 10.99)
+    if (/^\d+\.\d+$/.test(p)) {
+      return `$${p}`;
+    }
+
+    // 순수 정수 (나중에 KRW 변환)
+    if (/^\d+$/.test(p)) {
+      return `${Number(p).toLocaleString("en-US")}`;
+    }
+
+    return "가격 정보 없음";
   };
 
   useEffect(() => {
@@ -101,7 +108,6 @@ function SteamRankKorea() {
             <div className="game-info">
               <div className="game-title">{game.name}</div>
 
-              {/* 가격 표시 영역 수정 */}
               <div className="game-sub">{formatPrice(game.price)}</div>
 
               <div className="game-sub">현재 동접자: {game.players}</div>

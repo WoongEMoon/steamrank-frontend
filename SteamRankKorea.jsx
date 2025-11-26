@@ -1,25 +1,20 @@
+// SteamRankKorea.jsx
 import React, { useState, useEffect, useRef } from "react";
 import "./App.css";
 
 const API_URL = "https://steamrank-backend.onrender.com/api/rankings";
 
-// ★ 가격 포맷 완전 해결
+// 가격 포맷
 const formatPrice = (price) => {
-    if (price === null || price === undefined || price === "") {
-        return "가격 정보 없음";
-    }
+    if (price === null || price === undefined || price === "") return "가격 정보 없음";
 
-    // free 문자열
-    if (typeof price === "string" && price.toLowerCase() === "free") {
+    if (typeof price === "string" && price.toLowerCase() === "free")
         return "무료 플레이";
-    }
 
-    // 숫자(Number) 형태 가격 (예: 10.99)
-    if (typeof price === "number") {
-        return `$${price.toFixed(2)}`;
-    }
+    // 숫자 → 반드시 $ 붙이기
+    if (typeof price === "number") return `$${price.toFixed(2)}`;
 
-    // 문자열 가격 "10.99"
+    // 문자열 숫자
     if (/^\d+(\.\d{1,2})?$/.test(price)) {
         return `$${parseFloat(price).toFixed(2)}`;
     }
@@ -64,16 +59,13 @@ function SteamRankKorea() {
 
     const scrollToGame = (appid) => {
         const element = itemRefs.current[appid];
-        if (element) {
+        if (element)
             element.scrollIntoView({ behavior: "smooth", block: "center" });
-        }
     };
 
     return (
         <div className="app-container">
-            <h1 className="title">
-                🎮 <span>SteamRank Korea</span>
-            </h1>
+            <h1 className="title">🎮 SteamRank Korea</h1>
 
             <div className="controls">
                 <input

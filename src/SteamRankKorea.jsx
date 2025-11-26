@@ -1,4 +1,4 @@
-// SteamRankKorea.jsx (FINAL FIXED FOR profile_img)
+// SteamRankKorea.jsx (FINAL — box clickable)
 import React, { useState, useEffect, useRef } from "react";
 import "./App.css";
 
@@ -96,16 +96,23 @@ function SteamRankKorea() {
 
       <div className="game-list">
         {games.map((game, idx) => {
-          // 🔥 여기! API 구조에 맞춘 최종 이미지 필드
           const imgSrc =
             game.profile_img ||
             "https://via.placeholder.com/160x90?text=No+Image";
+
+          const openSteam = () => {
+            window.open(
+              `https://store.steampowered.com/app/${game.steam_appid}`,
+              "_blank"
+            );
+          };
 
           return (
             <div
               key={game.steam_appid}
               ref={(el) => (itemRefs.current[game.steam_appid] = el)}
               className="game-item"
+              onClick={openSteam}   // 🔥 박스 클릭 시 이동
             >
               <div className="rank">#{idx + 1}</div>
 
@@ -120,15 +127,7 @@ function SteamRankKorea() {
               />
 
               <div className="game-info">
-                <div className="game-title">
-                  <a
-                    href={`https://store.steampowered.com/app/${game.steam_appid}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    {game.name}
-                  </a>
-                </div>
+                <div className="game-title">{game.name}</div>
 
                 <div className="price">{formatPrice(game.price)}</div>
                 <div className="players">

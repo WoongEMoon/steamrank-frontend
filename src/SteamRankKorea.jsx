@@ -84,8 +84,6 @@ function SteamRankKorea() {
               <div className="game-sub">{game.price || "가격 정보 없음"}</div>
               <div className="game-sub">현재 동접자: {game.players}</div>
             </div>
-
-            <div className="right-label">동접자 수 기준 랭킹</div>
           </div>
         ))}
       </div>
